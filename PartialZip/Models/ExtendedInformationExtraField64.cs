@@ -1,40 +1,37 @@
 ﻿using PartialZip.Exceptions;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace PartialZip.Models
 {
-    internal class ExtendedInformationExtraField64
-    {
-        internal static uint Size => 2 * sizeof(ushort);
+	internal class ExtendedInformationExtraField64
+	{
+		internal static uint Size => 2 * sizeof(ushort);
 
-        internal ExtendedInformationExtraField64(byte[] buffer)
-        {
-            if (buffer.Length >= ExtendedInformationExtraField64.Size)
-            {
-                using (BinaryReader reader = new BinaryReader(new MemoryStream(buffer)))
-                {
-                    this.FieldTag = reader.ReadUInt16();
-                    this.FieldSize = reader.ReadUInt16();
+		internal ExtendedInformationExtraField64(byte[] buffer)
+		{
+			if(buffer.Length >= Size)
+			{
+				using(BinaryReader reader = new BinaryReader(new MemoryStream(buffer)))
+				{
+					FieldTag = reader.ReadUInt16();
+					FieldSize = reader.ReadUInt16();
 
-                    this.ExtraField = new ulong[(reader.BaseStream.Length - reader.BaseStream.Position) / sizeof(ulong)];
+					ExtraField = new ulong[(reader.BaseStream.Length - reader.BaseStream.Position) / sizeof(ulong)];
 
-                    for (int i = 0; i < this.ExtraField.Length; i++)
-                        this.ExtraField[i] = reader.ReadUInt64();
-                }
-            }
-            else
-            {
-                throw new PartialZipParsingException("Failed to parse ZIP64 extended information field. The supplied buffer is too small");
-            }
-        }
+					for(int i = 0; i < ExtraField.Length; i++)
+						ExtraField[i] = reader.ReadUInt64();
+				}
+			}
+			else
+			{
+				throw new PartialZipParsingException("Failed to parse ZIP64 extended information field. The supplied buffer is too small");
+			}
+		}
 
-        internal ushort FieldTag { get; set; }
+		internal ushort FieldTag {get; set;}
 
-        internal ushort FieldSize { get; set; }
+		internal ushort FieldSize {get; set;}
 
-        internal ulong[] ExtraField { get; set; }
-    }
+		internal ulong[] ExtraField {get; set;}
+	}
 }
